@@ -3,6 +3,7 @@
   <includeClasses>
     <classEntry path="pbjAS.PBJAssembler"/>
     <classEntry path="pbjAS.PBJDisassembler"/>
+    <classEntry path="pbjAS.Tools"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

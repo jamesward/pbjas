@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" applicationComplete="initApp()">
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml">
   
   <mx:Script>
   <![CDATA[
-    import __AS3__.vec.Vector;
     import flash.utils.ByteArray;
     
     import mx.controls.Alert;
@@ -19,62 +18,65 @@
     import pbjAS.params.Texture;
     import pbjAS.ops.OpSampleNearest;
   
-    private function initApp():void
+    private function startPBJ():void
     {
+      var width:Number = 5000;
+      var height:Number = 1000;
+      
       var myPBJ:PBJ = new PBJ();
       myPBJ.version = 1;
-      myPBJ.name = "OpSampleNearest";
+      myPBJ.name = "TestOpSampleNearest";
       myPBJ.metadatas = [];
       myPBJ.parameters = [{name:"_OutCoord", p:new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G])), metas:[]}, // f0.rg
-        {name:"texture", p:new Texture(1, 0), metas:[]}, // t0
-        {name:"result", p:new Parameter(PBJType.TFloat, true, new RFloat(1)), metas:[]} // f1
+        {name:"texture", p:new Texture(2, 0), metas:[]}, // t0
+        {name:"result", p:new Parameter(PBJType.TFloat2, true, new RFloat(1, [PBJChannel.R, PBJChannel.G])), metas:[]} // f1.rg
         ];
       myPBJ.code = [
-        new OpSampleNearest(new RFloat(1), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f1, f0.rg, t0
-      ];
+        new OpSampleNearest(new RFloat(1, [PBJChannel.R, PBJChannel.G]), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f1.rg, f0.rg, t0
+        ];
 
-      var output:ByteArray = PBJAssembler.assemble(myPBJ);
+      var assembledPBJByteArray:ByteArray = PBJAssembler.assemble(myPBJ);
+
+      var texture:Vector.<Number> = new Vector.<Number>();
+
+      for (var i:int = 0; i < height; i++)
+      {
+        for (var j:int = 0; j < width; j++)
+        {
+          var n:Number = Math.round(Math.random() * 1000);
+          texture.push(j);
+          texture.push(i);
+        }
+      }
+
+      var testShader:Shader = new Shader(assembledPBJByteArray);
 
       var f:File = File.desktopDirectory.resolvePath("test.pbj");
       var fStream:FileStream = new FileStream();
       fStream.open(f, FileMode.WRITE);
-      fStream.writeBytes(output);
+      fStream.writeBytes(assembledPBJByteArray);
       fStream.close();
-      
-      var width:uint = 10;
-
-      var texture:Vector.<Number> = new Vector.<Number>();
-
-      for (var i:int = 0; i < width; i++)
-      {
-          texture.push(i);
-      }
-
-      var testShader:Shader = new Shader(output);
 
       testShader.data.texture.width = width;
-      testShader.data.texture.height = 1;
+      testShader.data.texture.height = height;
       testShader.data.texture.input = texture;
 
       var result:Vector.<Number> = new Vector.<Number>;
 
       var shaderJob:ShaderJob = new ShaderJob(testShader, result, width, height);
-      shaderJob.start(true);
-
-	    for (var j:int = 0; j < texture.length; j++)
-      {
-          var actual:Number = texture[j];
-          var tested:Number = result[j];
-
-          if (actual != tested)
-          {
-            ta.text = "The tested value at " + i + " was not correct. actual = " + actual + " | tested = " + tested + "\n" + texture + "\n" + result;
-          }
-      }
-
+      shaderJob.addEventListener(Event.COMPLETE, onFloatShaderJobComplete);
+      shaderJob.start();
     }
+    
+    private function onFloatShaderJobComplete(event:Event):void
+    {
+      ta.text = "done! \n";
+    }
+      
   ]]>
   </mx:Script>
+  
+  <mx:Button label="start" click="startPBJ()"/>
   
   <mx:TextArea id="ta" width="100%" height="100%"/>
   
