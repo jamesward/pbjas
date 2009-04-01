@@ -2,7 +2,7 @@ package pbjAS.params
 {
   import pbjAS.regs.PBJReg;
   
-  public class Parameter implements PBJParam
+  public class Parameter implements IParameter
   {
     public var type:String;
     public var out:Boolean;

@@ -57,22 +57,22 @@ package pbjAS
         writeMeta(m, o);
       }
 
-      for each (var pp:Object in pbj.parameters)
+      for each (var pp:PBJParam in pbj.parameters)
       {
-        if (pp.p is Parameter)
+        if (pp.parameter is Parameter)
         {
           o.writeByte(0xA1);
-          o.writeByte((pp.p as Parameter).out ? 2 : 1);
-          o.writeByte(getTypeCode((pp.p as Parameter).type));
-          o.writeShort(regCode((pp.p as Parameter).reg));
+          o.writeByte((pp.parameter as Parameter).out ? 2 : 1);
+          o.writeByte(getTypeCode((pp.parameter as Parameter).type));
+          o.writeShort(regCode((pp.parameter as Parameter).reg));
 
           var e;
-          if (((pp.p as Parameter).reg is RInt) || ((pp.p as Parameter).reg is RFloat))
+          if (((pp.parameter as Parameter).reg is RInt) || ((pp.parameter as Parameter).reg is RFloat))
           {
-            e=(pp.p as Parameter).reg.data;
+            e=(pp.parameter as Parameter).reg.data;
           }
 
-          switch ((pp.p as Parameter).type)
+          switch ((pp.parameter as Parameter).type)
           {
             case PBJType.TFloat2x2:
               assert(e, null);
@@ -91,19 +91,19 @@ package pbjAS
               break;
           }
         }
-        else if (pp.p is Texture)
+        else if (pp.parameter is Texture)
         {
           o.writeByte(0xA3);
-          o.writeByte((pp.p as Texture).index);
-          o.writeByte((pp.p as Texture).channels);
+          o.writeByte((pp.parameter as Texture).index);
+          o.writeByte((pp.parameter as Texture).channels);
         }
         o.writeUTFBytes(pp.name);
         o.writeByte(0);
 
-        for each (var m:PBJMeta in pbj.metadatas)
+        for each (var mm:PBJMeta in pp.metadatas)
         {
           o.writeByte(0xA2);
-          writeMeta(m, o);
+          writeMeta(mm, o);
         }
       }
 

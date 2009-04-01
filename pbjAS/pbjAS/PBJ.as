@@ -5,7 +5,7 @@ package pbjAS
     public var version:int;
     public var name:String;
     public var metadatas:Array; // <PBJMeta>
-    public var parameters:Array; // <{ name : String, metas : Array<PBJMeta>, p : PBJParam }>
+    public var parameters:Array; // <PBJParam>
     public var code:Array; // <PBJOpcode>
   }
 }

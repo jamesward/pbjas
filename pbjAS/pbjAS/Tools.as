@@ -31,7 +31,7 @@ package pbjAS
   
   import pbjAS.consts.*;
   import pbjAS.ops.*;
-  import pbjAS.params.PBJParam;
+  import pbjAS.params.IParameter;
   import pbjAS.params.Parameter;
   import pbjAS.params.Texture;
   import pbjAS.regs.PBJReg;

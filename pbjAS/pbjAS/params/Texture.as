@@ -1,6 +1,6 @@
 package pbjAS.params
 {
-  public class Texture implements PBJParam
+  public class Texture implements IParameter
   {
     public var channels:int;
     public var index:int;

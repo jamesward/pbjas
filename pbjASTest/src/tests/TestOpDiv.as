@@ -5,9 +5,9 @@ package tests
   import flash.events.Event;
   import flash.utils.ByteArray;
   import flash.utils.Endian;
-
+  
   import net.digitalprimates.fluint.tests.TestCase;
-
+  
   import pbjAS.PBJ;
   import pbjAS.PBJAssembler;
   import pbjAS.PBJChannel;
@@ -15,6 +15,7 @@ package tests
   import pbjAS.PBJParam;
   import pbjAS.PBJType;
   import pbjAS.Tools;
+  import pbjAS.ops.OpDiv;
   import pbjAS.ops.OpMov;
   import pbjAS.ops.OpMul;
   import pbjAS.ops.OpSampleNearest;
@@ -23,7 +24,7 @@ package tests
   import pbjAS.regs.RFloat;
   import pbjAS.regs.RInt;
 
-  public class TestOpSampleNearest extends TestCase
+  public class TestOpDiv extends TestCase
   {
     private var width:uint = 12; // a multiple of 1, 2, 3, and 4 so that we don't run into weirdness
     private var height:uint = 1;
@@ -37,9 +38,12 @@ package tests
       myPBJ.metadatas = [];
       myPBJ.parameters = [new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G]))), // f0.rg
         new PBJParam("texture", new Texture(1, 0)), // t0
-        new PBJParam("result", new Parameter(PBJType.TFloat, true, new RFloat(1))) // f1
+        new PBJParam("divisor", new Parameter(PBJType.TFloat, false, new RFloat(1))), // f1
+        new PBJParam("result", new Parameter(PBJType.TFloat, true, new RFloat(2))) // f2
         ];
-      myPBJ.code = [new OpSampleNearest(new RFloat(1), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f1, f0.rg, t0
+      myPBJ.code = [
+        new OpSampleNearest(new RFloat(2), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f2, f0.rg, t0
+        new OpDiv(new RFloat(2), new RFloat(1))
         ];
 
       runTest(myPBJ, 1);
@@ -53,9 +57,12 @@ package tests
       myPBJ.metadatas = [];
       myPBJ.parameters = [new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G]))), // f0.rg
         new PBJParam("texture", new Texture(2, 0)), // t0
-        new PBJParam("result", new Parameter(PBJType.TFloat2, true, new RFloat(1))) // f1
+        new PBJParam("divisor", new Parameter(PBJType.TFloat, false, new RFloat(1))), // f1
+        new PBJParam("result", new Parameter(PBJType.TFloat2, true, new RFloat(2))) // f2
         ];
-      myPBJ.code = [new OpSampleNearest(new RFloat(1), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f1, f0.rg, t0
+      myPBJ.code = [
+      new OpSampleNearest(new RFloat(2), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f2, f0.rg, t0
+      new OpDiv(new RFloat(2), new RFloat(1, [PBJChannel.R, PBJChannel.R]))
         ];
 
       runTest(myPBJ, 2);
@@ -69,9 +76,12 @@ package tests
       myPBJ.metadatas = [];
       myPBJ.parameters = [new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G]))), // f0.rg
         new PBJParam("texture", new Texture(3, 0)), // t0
-        new PBJParam("result", new Parameter(PBJType.TFloat3, true, new RFloat(1))) // f1
+        new PBJParam("divisor", new Parameter(PBJType.TFloat, false, new RFloat(1))), // f1
+        new PBJParam("result", new Parameter(PBJType.TFloat3, true, new RFloat(2))) // f2
         ];
-      myPBJ.code = [new OpSampleNearest(new RFloat(1), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f1, f0.rg, t0
+      myPBJ.code = [
+        new OpSampleNearest(new RFloat(2), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f2.rgb, f0.rg, t0
+        new OpDiv(new RFloat(2), new RFloat(1, [PBJChannel.R, PBJChannel.R, PBJChannel.R])) // div f2.rgb, f1.rrr
         ];
 
       runTest(myPBJ, 3);
@@ -85,9 +95,12 @@ package tests
       myPBJ.metadatas = [];
       myPBJ.parameters = [new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G]))), // f0.rg
         new PBJParam("texture", new Texture(4, 0)), // t0
-        new PBJParam("result", new Parameter(PBJType.TFloat4, true, new RFloat(1))) // f1
+        new PBJParam("divisor", new Parameter(PBJType.TFloat, false, new RFloat(1))), // f1
+        new PBJParam("result", new Parameter(PBJType.TFloat4, true, new RFloat(2))) // f2
         ];
-      myPBJ.code = [new OpSampleNearest(new RFloat(1), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f1, f0.rg, t0
+      myPBJ.code = [
+        new OpSampleNearest(new RFloat(2), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f1, f0.rg, t0
+        new OpDiv(new RFloat(2), new RFloat(1, [PBJChannel.R, PBJChannel.R, PBJChannel.R, PBJChannel.R]))
         ];
 
       runTest(myPBJ, 4);
@@ -103,16 +116,20 @@ package tests
       {
         for (var j:int = 0; j < width; j++)
         {
-          var n:Number = Math.round(Math.random() * 1000);
+          var n:Number = Math.round(Math.random() * 1000) + 1;
           texture.push(n);
         }
       }
-
+      
+      var divisor:Number = (Math.random() * 10) + 1;
+      
       var testShader:Shader = new Shader(assembledPBJByteArray);
 
       testShader.data.texture.width = width / innerWidth;
       testShader.data.texture.height = height;
       testShader.data.texture.input = texture;
+      
+      testShader.data.divisor.value = [divisor];
 
       var result:Vector.<Number> = new Vector.<Number>;
 
@@ -126,10 +143,10 @@ package tests
 
       for (var k:int = 0; k < texture.length; k++)
       {
-        var actual:Number = texture[k];
+        var actual:Number = (texture[k] / divisor);
         var tested:Number = result[k];
 
-        if (actual != tested)
+        if (Math.round(actual) != Math.round(tested))
         {
           fail("The tested value at " + k + " was not correct. actual = " + actual + " | tested = " + tested + "\n" + texture + "\n" + result);
         }

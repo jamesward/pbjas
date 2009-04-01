@@ -35,7 +35,9 @@ package tests
       myPBJ.version = 1;
       myPBJ.name = "SingleMulFilter";
       myPBJ.metadatas = [];
-      myPBJ.parameters = [{name:"num1", p:new Parameter(PBJType.TFloat, false, new RFloat(0)), metas:[]}, {name:"num2", p:new Parameter(PBJType.TFloat, false, new RFloat(1)), metas:[]}, {name:"product", p:new Parameter(PBJType.TFloat, true, new RFloat(2)), metas:[]}];
+      myPBJ.parameters = [{name:"num1", p:new Parameter(PBJType.TFloat, false, new RFloat(0)), metas:[]},
+        {name:"num2", p:new Parameter(PBJType.TFloat, false, new RFloat(1)), metas:[]},
+        {name:"product", p:new Parameter(PBJType.TFloat, true, new RFloat(2)), metas:[]}];
       myPBJ.code = [new OpMul(new RFloat(0), new RFloat(1)), new OpMov(new RFloat(2), new RFloat(0))];
 
       var assembledPBJByteArray:ByteArray = PBJAssembler.assemble(myPBJ);
@@ -67,12 +69,14 @@ package tests
       myPBJ.version = 1;
       myPBJ.name = "MulManyFilter";
       myPBJ.metadatas = [];
-      myPBJ.parameters = [{name:"_OutCoord", p:new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G])), metas:[]}, // f0
+      myPBJ.parameters = [{name:"_OutCoord", p:new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R,
+            PBJChannel.G])), metas:[]}, // f0
         {name:"tex", p:new Texture(1, 0), metas:[]}, // t0
         {name:"num", p:new Parameter(PBJType.TFloat, false, new RFloat(1)), metas:[]}, // f1
         {name:"product", p:new Parameter(PBJType.TFloat, true, new RFloat(2)), metas:[]} // f2
         ];
-      myPBJ.code = [new OpSampleNearest(new RFloat(2), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f2, f0, t0
+      myPBJ.code = [new OpSampleNearest(new RFloat(2), new RFloat(0, [PBJChannel.R,
+        PBJChannel.G]), 0), // texn    f2, f0, t0
         new OpMul(new RFloat(2), new RFloat(1)), // mul f2, f1
         ];
 
@@ -128,7 +132,7 @@ package tests
 
           if (realProduct != calcProduct)
           {
-            fail("On row number " + k + " and column number " + l + " the product was not correct. realProduct = " + realProduct + " | calcProduct = " + calcProduct);// + "\n" + Tools.hexDemp(expectedResult) + "\n" + Tools.hexDemp(result));
+            fail("On row number " + k + " and column number " + l + " the product was not correct. realProduct = " + realProduct + " | calcProduct = " + calcProduct); // + "\n" + Tools.hexDemp(expectedResult) + "\n" + Tools.hexDemp(result));
           }
         }
       }

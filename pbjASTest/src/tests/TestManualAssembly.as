@@ -9,6 +9,7 @@ package tests
   import pbjAS.PBJAssembler;
   import pbjAS.PBJChannel;
   import pbjAS.PBJDisassembler;
+  import pbjAS.PBJParam;
   import pbjAS.PBJType;
   import pbjAS.ops.OpMov;
   import pbjAS.ops.OpMul;
@@ -36,10 +37,10 @@ package tests
       myPBJ.name = "VerySimpleFilter";
       myPBJ.metadatas = [];
       myPBJ.parameters = [
-        {name: "_OutCoord", p: new Parameter(PBJType.TFloat2, false, new RFloat(0,[PBJChannel.R,PBJChannel.G])), metas: [] },  // parameter   "_OutCoord", float2, f0.rg, in
-        {name: "src", p: new Texture(4,0), metas: [] },  // texture     "src", t0
-        {name: "dst", p: new Parameter(PBJType.TFloat4, true, new RFloat(1)), metas: [] },  // parameter   "dst", float4, f1, out
-        {name: "exposure", p: new Parameter(PBJType.TFloat, false, new RFloat(0, [PBJChannel.B])), metas: [] }  // parameter   "exposure", float, f0.b, in
+        new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, new RFloat(0,[PBJChannel.R,PBJChannel.G]))),  // parameter   "_OutCoord", float2, f0.rg, in
+        new PBJParam("src", new Texture(4,0)),  // texture     "src", t0
+        new PBJParam("dst", new Parameter(PBJType.TFloat4, true, new RFloat(1))),  // parameter   "dst", float4, f1, out
+        new PBJParam("exposure", new Parameter(PBJType.TFloat, false, new RFloat(0, [PBJChannel.B])))  // parameter   "exposure", float, f0.b, in
       ];
       myPBJ.code = [
         new OpSampleNearest(new RFloat(2), new RFloat(0,[PBJChannel.R, PBJChannel.G]), 0),  // texn    f2, f0.rg, t0

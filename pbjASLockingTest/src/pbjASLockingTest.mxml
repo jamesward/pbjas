@@ -24,7 +24,11 @@
     import pbjAS.ops.OpSampleNearest;
   
     [Bindable] private var initDone:Boolean = false;
+    [Bindable] private var running:Boolean = false;
+
+    private var timer:Timer;
     
+    private var testShader:Shader;
     private var shaderJob:ShaderJob
     
     private function initApp():void
@@ -67,26 +71,27 @@
         }
       }
 
-      var testShader:Shader = new Shader(assembledPBJByteArray);
+      testShader = new Shader(assembledPBJByteArray);
 
       testShader.data.texture.width = width;
       testShader.data.texture.height = height;
       testShader.data.texture.input = texture;
-
-      var result:Vector.<Number> = new Vector.<Number>;
-
-      shaderJob = new ShaderJob(testShader, result, width, height);
-      shaderJob.addEventListener(Event.COMPLETE, onFloatShaderJobComplete);
       
       initDone = true;
     }
     
     private function startJob():void
     {
-      var timer:Timer = new Timer(100);
+      running = true;
+      
+      timer = new Timer(100);
       timer.addEventListener(TimerEvent.TIMER, tick);
       timer.start();
       
+      var result:Vector.<Number> = new Vector.<Number>;
+
+      shaderJob = new ShaderJob(testShader, result, width, height);
+      shaderJob.addEventListener(Event.COMPLETE, onFloatShaderJobComplete);
       shaderJob.start();
     }
     
@@ -97,14 +102,30 @@
     
     private function onFloatShaderJobComplete(event:ShaderEvent):void
     {
+      shutDownJob();
       ta.text = "done! \n";
+    }
+    
+    private function stopJob():void
+    {
+      shaderJob.cancel();
+      shutDownJob();
+    }
+    
+    private function shutDownJob():void
+    {
+      running = false;
+      timer.stop();
     }
       
   ]]>
   </mx:Script>
   
-  <mx:Button label="start" click="startJob()" enabled="{initDone}"/>
+  <mx:HBox>
+    <mx:Button label="start" click="startJob()" enabled="{initDone &amp;&amp; !running}"/>
+    <mx:Button label="cancel" click="stopJob()" enabled="{running}"/>
+  </mx:HBox>
   
-  <mx:TextArea id="ta" width="100%" height="100%"/>
+  <mx:Label id="ta"/>
   
 </mx:Application>
