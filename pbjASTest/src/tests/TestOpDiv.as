@@ -14,7 +14,6 @@ package tests
   import pbjAS.PBJDisassembler;
   import pbjAS.PBJParam;
   import pbjAS.PBJType;
-  import pbjAS.Tools;
   import pbjAS.ops.OpDiv;
   import pbjAS.ops.OpMov;
   import pbjAS.ops.OpMul;
@@ -29,7 +28,6 @@ package tests
     private var width:uint = 12; // a multiple of 1, 2, 3, and 4 so that we don't run into weirdness
     private var height:uint = 1;
 
-    // broken due to a Flash Player bug
     public function testFloat():void
     {
       var myPBJ:PBJ = new PBJ();
@@ -39,7 +37,7 @@ package tests
       myPBJ.parameters = [new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G]))), // f0.rg
         new PBJParam("texture", new Texture(1, 0)), // t0
         new PBJParam("divisor", new Parameter(PBJType.TFloat, false, new RFloat(1))), // f1
-        new PBJParam("result", new Parameter(PBJType.TFloat, true, new RFloat(2))) // f2
+        new PBJParam("result", new Parameter(PBJType.TFloat, true, new RFloat(2, [PBJChannel.R]))) // f2
         ];
       myPBJ.code = [
         new OpSampleNearest(new RFloat(2), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f2, f0.rg, t0

@@ -9,8 +9,12 @@ package tests
   import pbjAS.PBJAssembler;
   import pbjAS.PBJChannel;
   import pbjAS.PBJDisassembler;
+  import pbjAS.PBJMeta;
   import pbjAS.PBJParam;
+  import pbjAS.PBJTools;
   import pbjAS.PBJType;
+  import pbjAS.consts.PInt;
+  import pbjAS.consts.PString;
   import pbjAS.ops.OpMov;
   import pbjAS.ops.OpMul;
   import pbjAS.ops.OpSampleNearest;
@@ -35,7 +39,12 @@ package tests
       var myPBJ:PBJ = new PBJ();
       myPBJ.version = 1;
       myPBJ.name = "VerySimpleFilter";
-      myPBJ.metadatas = [];
+      myPBJ.metadatas = [
+        new PBJMeta("namespace", new PString("com.jamesward.pixelbender")),
+        new PBJMeta("vendor", new PString("James Ward")),
+        new PBJMeta("version", new PInt(1)),
+        new PBJMeta("description", new PString("A very simple filter."))
+      ];
       myPBJ.parameters = [
         new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, new RFloat(0,[PBJChannel.R,PBJChannel.G]))),  // parameter   "_OutCoord", float2, f0.rg, in
         new PBJParam("src", new Texture(4,0)),  // texture     "src", t0
@@ -57,6 +66,8 @@ package tests
     //
     public function testLength():void
     {
+      trace(PBJTools.hexDump(originalPBJByteArray));
+      trace(PBJTools.hexDump(assembledPBJByteArray));
       assertEquals(originalPBJByteArray.length, assembledPBJByteArray.length);
     }
     

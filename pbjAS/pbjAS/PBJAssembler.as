@@ -284,9 +284,9 @@ package pbjAS
 
     private static function writeMeta(m:PBJMeta, o:ByteArray):void
     {
-      var t = Tools.getValueType(m.value);
+      var t:String = PBJTools.getValueType(m.value);
       o.writeByte(getTypeCode(t));
-      o.writeUTF(m.key);
+      o.writeUTFBytes(m.key);
       o.writeByte(0);
       writeValue(m.value, o);
     }

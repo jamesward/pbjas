@@ -13,7 +13,7 @@ package tests
   import pbjAS.PBJChannel;
   import pbjAS.PBJDisassembler;
   import pbjAS.PBJType;
-  import pbjAS.Tools;
+  import pbjAS.PBJTools;
   import pbjAS.ops.OpMov;
   import pbjAS.ops.OpMul;
   import pbjAS.ops.OpSampleNearest;

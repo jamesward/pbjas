@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <flexLibProperties version="1">
   <includeClasses>
-    <classEntry path="pbjAS.Tools"/>
     <classEntry path="pbjAS.PBJDisassembler"/>
     <classEntry path="pbjAS.PBJAssembler"/>
   </includeClasses>
