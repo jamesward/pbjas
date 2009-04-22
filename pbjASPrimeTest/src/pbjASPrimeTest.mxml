@@ -13,6 +13,7 @@
     import pbjAS.PBJType;
     import pbjAS.params.Parameter;
     import pbjAS.PBJ;
+    import pbjAS.PBJTools;
     import pbjAS.PBJAssembler;
     import pbjAS.PBJChannel;
     import pbjAS.params.Texture;
@@ -70,30 +71,7 @@
     private function findPrimes(texture:Vector.<Number>, evaluator:Number):void
     {
       
-      // adjust the texture so that it is a float4
-      while (texture.length % 4 != 0)
-      {
-        texture.push(1);
-      }
-      
-      // split into slices (height > 1)
-      var sl:Number = texture.length / 4;
-      var d:Number = Math.sqrt(sl);
-      var w:Number = Math.ceil(sl / Math.floor(d));
-      var h:Number = Math.ceil(sl / w);
-      
-      // adjust the texture so that it fits the dimensions
-      while (texture.length < (w * h * 4))
-      {
-        texture.push(1);
-        texture.push(1);
-        texture.push(1);
-        texture.push(1);
-      }
-      
-      testShader.data.texture.width = w
-      testShader.data.texture.height = h
-      testShader.data.texture.input = texture;
+      PBJTools.splitShaderInputFloat4(testShader.data.texture, texture, 1);
       
       testShader.data.check.value = [evaluator];
       
@@ -137,12 +115,17 @@
       {
         findPrimes(texture, texture[0]);
       }
+      else
+      {
+        rl.text = (new Date().time - startTime.time) + " ms";
+      }
     }
       
   ]]>
   </mx:Script>
   
   <mx:Panel label="Primes" width="100%" height="100%">
+    <mx:Label id="rl"/>
     <mx:TextArea id="ta" width="100%" height="100%"/>
     <mx:ControlBar>
       <mx:ComboBox id="limit">

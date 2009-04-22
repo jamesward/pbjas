@@ -7,7 +7,7 @@ package pbjAS.ops
      public var dst:PBJReg;
      public var src:PBJReg;
      
-     public function OpSin(dst:PBJReg, src:PBJReg)
+     public function OpASin(dst:PBJReg, src:PBJReg)
      {
        this.dst = dst;
        this.src = src;

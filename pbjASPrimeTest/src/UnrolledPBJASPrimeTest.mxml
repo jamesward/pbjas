@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" applicationComplete="init()">
+
+  <mx:Script>
+    <![CDATA[
+      import pbjAS.params.Texture;
+      import mathpbj.MathFunctionJob;
+      import mathpbj.MathEvent;
+
+      private var primes:Vector.<Number>;
+      
+      private var startTime:Date;
+
+      private var mathFunc:MathFunctionJob;
+
+      private function init():void
+      {
+        primes = new Vector.<Number>();
+        
+        mathFunc = new MathFunctionJob();
+        mathFunc.addEventListener(MathEvent.COMPLETE, handleMathFuncComplete);
+        
+        for (var i:uint = 0; i < 1000; i++)
+        {
+          // do 1000 divs in the PBJ filter
+          mathFunc.add("div");
+        }
+        
+        var t:Timer = new Timer(250);
+        t.addEventListener(TimerEvent.TIMER, tick);
+        t.start();
+      }
+      
+      private function tick(event:TimerEvent):void
+      {
+        ta.text = primes.toString();
+      }
+
+      private function startPBJ():void
+      {
+        ta.text = "";
+
+        primes = new Vector.<Number>();
+
+        var l:Number = new Number(limit.selectedItem);
+
+        startTime = new Date();
+
+        var texture:Vector.<Number> = new Vector.<Number>();
+
+        for (var i:Number = 2; i <= l; i++)
+        {
+          texture.push(i);
+        }
+        
+        mathFunc.input = texture;
+        mathFunc.inputParams["divisor"] = 2;
+        mathFunc.start();
+      }
+
+      private function handleMathFuncComplete(event:MathEvent):void
+      {
+        var results:Vector.<Number> = event.results;
+
+        rl.text = (new Date().time - startTime.time) + " ms";
+      }
+
+    ]]>
+  </mx:Script>
+
+  <mx:Panel title="Primes" width="100%" height="100%">
+    <mx:Label id="rl"/>
+    <mx:TextArea id="ta" width="100%" height="100%" focusEnabled="false" borderStyle="none" editable="false"/>
+    <mx:ControlBar>
+      <mx:ComboBox id="limit">
+        <mx:dataProvider>
+          <mx:Array>
+            <mx:Number>10</mx:Number>
+            <mx:Number>100</mx:Number>
+            <mx:Number>1000</mx:Number>
+            <mx:Number>10000</mx:Number>
+            <mx:Number>100000</mx:Number>
+            <mx:Number>1000000</mx:Number>
+          </mx:Array>
+        </mx:dataProvider>
+      </mx:ComboBox>
+      <mx:Button label="Find Primes!" click="startPBJ()"/>
+    </mx:ControlBar>
+  </mx:Panel>
+
+</mx:Application>

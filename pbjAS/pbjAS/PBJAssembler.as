@@ -66,10 +66,10 @@ package pbjAS
           o.writeByte(getTypeCode((pp.parameter as Parameter).type));
           o.writeShort(regCode((pp.parameter as Parameter).reg));
 
-          var e;
+          var e:Array;
           if (((pp.parameter as Parameter).reg is RInt) || ((pp.parameter as Parameter).reg is RFloat))
           {
-            e=(pp.parameter as Parameter).reg.data;
+            e = (pp.parameter as Parameter).reg.data;
           }
 
           switch ((pp.parameter as Parameter).type)
@@ -238,20 +238,20 @@ package pbjAS
       else if (v is PFloat2x2)
       {
         assert(v.a.length, 4);
-        for each (var f:Number in v.a)
-          writeFloat(f, o);
+        for each (var f2x2:Number in v.a)
+          writeFloat(f2x2, o);
       }
       else if (v is PFloat3x3)
       {
         assert(v.a.length, 9);
-        for each (var f:Number in v.a)
-          writeFloat(f, o);
+        for each (var f3x3:Number in v.a)
+          writeFloat(f3x3, o);
       }
       else if (v is PFloat4x4)
       {
         assert(v.a.length, 16);
-        for each (var f:Number in v.a)
-          writeFloat(f, o);
+        for each (var f4x4:Number in v.a)
+          writeFloat(f4x4, o);
       }
       else if (v is PInt)
       {
@@ -367,7 +367,7 @@ package pbjAS
 
     private static function writeDest(dst:PBJReg, size:int, o:ByteArray):void
     {
-      var mask=destMask(dst.data);
+      var mask:int = destMask(dst.data);
       o.writeShort(regCode(dst));
       o.writeByte(mask << 4 | size);
     }
@@ -378,7 +378,7 @@ package pbjAS
       o.writeByte(srcSwizzle(src.data, size));
     }
 
-    private static function writeOp(code, dst:PBJReg, src:PBJReg, o:ByteArray):void
+    private static function writeOp(code:int, dst:PBJReg, src:PBJReg, o:ByteArray):void
     {
       o.writeByte(code);
       o.writeShort(regCode(dst));

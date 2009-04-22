@@ -44,12 +44,12 @@ package pbjAS
   public class PBJTools
   {
 
-    public static function ext(e:Array)
+    public static function ext(e:Array):String
     {
       if (e == null)
         return "";
-      var str = ".";
-      for each (var c in e)
+      var str:String = ".";
+      for each (var c:String in e)
       {
         switch (c)
         {
@@ -89,37 +89,37 @@ package pbjAS
       return null;
     }
 
-    static function call(p:String, vl:Array):String
+    private static function call(p:String, vl:Array):String
     {
       return p + "(" + vl.join(",") + ")";
     }
 
-    public static function dumpValue(v):String
+    public static function dumpValue(v:PBJConst):String
     {
       if (v is PFloat)
-        return v.f;
+        return (v as PFloat).f.toString();
       else if (v is PFloat2)
-        return call("float2", [v.f1, v.f2]);
+        return call("float2", [(v as PFloat2).f1, (v as PFloat2).f2]);
       else if (v is PFloat3)
-        return call("float3", [v.f1, v.f2, v.f3]);
+        return call("float3", [(v as PFloat3).f1, (v as PFloat3).f2, (v as PFloat3).f3]);
       else if (v is PFloat4)
-        return call("float4", [v.f1, v.f2, v.f3, v.f4]);
+        return call("float4", [(v as PFloat4).f1, (v as PFloat4).f2, (v as PFloat4).f3, (v as PFloat4).f4]);
       else if (v is PFloat2x2)
-        return call("float2x2", v.f);
+        return call("float2x2", (v as PFloat2x2).f);
       else if (v is PFloat3x3)
-        return call("float4x4", v.f);
+        return call("float3x3", (v as PFloat3x3).f);
       else if (v is PFloat4x4)
-        return call("float4x4", v.f);
+        return call("float4x4", (v as PFloat4x4).f);
       else if (v is PInt)
-        return new String(v.i);
+        return new String((v as PInt).i);
       else if (v is PInt2)
-        return call("int2", [v.i1, v.i2]);
+        return call("int2", [(v as PInt2).i1, (v as PInt2).i2]);
       else if (v is PInt3)
-        return call("int3", [v.i1, v.i2, v.i3]);
+        return call("int3", [(v as PInt3).i1, (v as PInt3).i2, (v as PInt3).i3]);
       else if (v is PInt4)
-        return call("int4", [v.i1, v.i2, v.i3, v.i4]);
+        return call("int4", [(v as PInt4).i1, (v as PInt4).i2, (v as PInt4).i3, (v as PInt4).i4]);
       else if (v is PString)
-        return "'" + v.s + "'";
+        return "'" + (v as PString).s + "'";
 
       return null;
     }
@@ -174,20 +174,20 @@ package pbjAS
       return t;
     }
 
-    public static function dumpOpCode(c):String
+    public static function dumpOpCode(c:PBJOpcode):String
     {
       if (c is OpNop)
         return "nop";
       else if (c is OpSampleNearest)
-        return "sampleNearest " + dumpReg(c.dst) + ", t" + c.srcTexture + "[" + dumpReg(c.src) + "]";
+        return "sampleNearest " + dumpReg((c as OpSampleNearest).dst) + ", t" + (c as OpSampleNearest).srcTexture + "[" + dumpReg((c as OpSampleNearest).src) + "]";
       else if (c is OpSampleLinear)
-        return "sampleLinear " + dumpReg(c.dst) + ", t" + c.srcTexture + "[" + dumpReg(c.src) + "]";
+        return "sampleLinear " + dumpReg((c as OpSampleLinear).dst) + ", t" + (c as OpSampleLinear).srcTexture + "[" + dumpReg((c as OpSampleLinear).src) + "]";
       else if (c is OpLoadInt)
-        return "loadint " + dumpReg(c.dst) + ", " + c.v;
+        return "loadint " + dumpReg((c as OpLoadInt).reg) + ", " + (c as OpLoadInt).v;
       else if (c is OpLoadFloat)
-        return "loadfloat " + dumpReg(c.dst) + ", " + c.v;
+        return "loadfloat " + dumpReg((c as OpLoadFloat).reg) + ", " + (c as OpLoadFloat).v;
       else if (c is OpIf)
-        return "if " + dumpReg(c.cond);
+        return "if " + dumpReg((c as OpIf).cond);
       else if (c is OpElse)
         return "else";
       else if (c is OpEndIf)
@@ -205,7 +205,7 @@ package pbjAS
         }
         return s;
         */
-        return op + " " + dumpReg(c.dst) + ", " + dumpReg(c.src);
+        return op + " " + dumpReg((c as Object).dst) + ", " + dumpReg((c as Object).src);
       }
       return null;
     }
@@ -290,6 +290,34 @@ package pbjAS
 
       shaderInput.width = w
       shaderInput.height = h
+      shaderInput.input = texture;
+    }
+    
+    public static function splitShaderInputFloat(shaderInput:ShaderInput, texture:Object, defaultValue:Number):void
+    {
+      if (texture.length > 16777216)
+      {
+        throw new Error("Texture length cannot exceed 16777216.");
+      }
+
+      var sl:Number = texture.length;
+      var d:Number = Math.sqrt(sl);
+      var w:Number = Math.ceil(sl / Math.floor(d));
+      var h:Number = Math.ceil(sl / w);
+
+      if ((w > 8192) || (h > 8192))
+      {
+        throw new Error("Texture width or height cannot exceed 8192");
+      }
+
+      // adjust the texture so that it fits the dimensions
+      while (texture.length < (w * h))
+      {
+        texture.push(1);
+      }
+
+      shaderInput.width = w;
+      shaderInput.height = h;
       shaderInput.input = texture;
     }
   }

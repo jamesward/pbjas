@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="horizontal" styleName="plain"
+  horizontalAlign="center" paddingTop="30" backgroundColor="#ffffff">
+  
+  <mx:Script>
+  <![CDATA[
+    import mathpbj.MathFunctionJob;
+    import mathpbj.MathEvent;
+    
+    
+    private var texture:Vector.<Number>;
+    
+    private var startTime:Date;
+    
+    private function startPBJ():void
+    {
+      startTime = new Date();
+
+      var mathFunc:MathFunctionJob = new MathFunctionJob();
+      mathFunc.addEventListener(MathEvent.COMPLETE, handleMathFuncComplete);
+      mathFunc.addEventListener(MathEvent.PROGRESS, tick, false, -1, true);
+      mathFunc.input = texture;
+      mathFunc.add("sqrt");
+      mathFunc.start();
+    }
+    
+    private function handleMathFuncComplete(event:MathEvent):void
+    {
+      texture = null;
+      event.currentTarget.removeEventListener(MathEvent.COMPLETE, handleMathFuncComplete);
+      
+      ta.text = ((new Date()).time - startTime.time) + " ms";
+    }
+    
+    private function tick(event:MathEvent):void
+    {
+      ta.text = Math.ceil(event.progress * 100) + "% complete";
+    }
+    
+    private function startAS3():void
+    {
+      startTime = new Date();
+      
+      for (var i:uint = 0; i < texture.length; i++)
+      {
+        texture[i] = Math.sqrt(texture[i]);
+      }
+      
+      ta.text = ((new Date()).time - startTime.time) + " ms";
+    }
+    
+    private function start():void
+    {
+      ta.text = "initializing dataset";
+      ta.validateNow();
+      
+      callLater(function():void { callLater(function():void { callLater(start2); }); });
+    }
+    
+    private function start2():void
+    {
+      texture = new Vector.<Number>(s.value);
+      for (var i:uint = 0; i < s.value; i++)
+      {
+        texture[i] = i + 1;
+      }
+      
+      ta.text = "starting test";
+      ta.validateNow();
+      
+      callLater(function():void { callLater(function():void { callLater(start3); }); });
+    }
+    
+    private function start3():void
+    {
+      if (pbEngine.selected)
+      {
+        startPBJ();
+      }
+      else
+      {
+        startAS3();
+      }
+    }
+  ]]>
+  </mx:Script>
+  
+  <mx:Panel title="Calculate Sqrts 1...{s.value}">
+    <mx:TextArea id="ta" width="100%" height="100%"/>
+    <mx:ControlBar>
+      <mx:HSlider id="s" value="1000000" minimum="1000000" maximum="20000000" liveDragging="true" snapInterval="1000000" tickInterval="1000000"/>
+      <mx:RadioButton groupName="engine" id="pbEngine" label="Pixel Bender" selected="true"/>
+      <mx:RadioButton groupName="engine" id="as3Engine" label="AS3"/>
+      <mx:Button label="Start!" click="start()"/>
+    </mx:ControlBar>
+  </mx:Panel>
+  
+</mx:Application>

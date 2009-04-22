@@ -79,10 +79,10 @@ package pbjAS
       }
     }
 
-    private static function srcReg(src, size):PBJReg
+    private static function srcReg(src:int, size:uint):PBJReg
     {
-      var sw = src >> 16;
-      var m = null;
+      var sw:int = src >> 16;
+      var m:Array = null;
       // 0x1B = 00 01 10 11
       if (sw != 0x1B)
       {
@@ -114,12 +114,12 @@ package pbjAS
       return reg(dst, m);
     }
 
-    private static function mReg(r, matrix):PBJReg
+    private static function mReg(r:int, matrix:uint):PBJReg
     {
       return reg(r & 0xFFFF, [chans[matrix + 3]]);
     }
 
-    private static function reg(t, s):PBJReg
+    private static function reg(t:int, s:Array):PBJReg
     {
       if ((t & 0x8000) != 0)
       {
@@ -136,7 +136,7 @@ package pbjAS
       return f;
     }
 
-    private static function readValue(t, ba:ByteArray):PBJConst
+    private static function readValue(t:String, ba:ByteArray):PBJConst
     {
       if (t == PBJType.TFloat)
       {
@@ -156,24 +156,24 @@ package pbjAS
       }
       else if (t == PBJType.TFloat2x2)
       {
-        var a = new Array();
-        for each (var n:uint in new Array(4))
-          a.push(readFloat(ba));
-        return new PFloat2x2(a);
+        var a2x2:Array = new Array();
+        for each (var n2x2:uint in new Array(4))
+          a2x2.push(readFloat(ba));
+        return new PFloat2x2(a2x2);
       }
       else if (t == PBJType.TFloat3x3)
       {
-        var a = new Array();
-        for each (var n:uint in new Array(9))
-          a.push(readFloat(ba));
-        return new PFloat3x3(a);
+        var a3x3:Array = new Array();
+        for each (var n3x3:uint in new Array(9))
+          a3x3.push(readFloat(ba));
+        return new PFloat3x3(a3x3);
       }
       else if (t == PBJType.TFloat4x4)
       {
-        var a = new Array();
-        for each (var n:uint in new Array(16))
-          a.push(readFloat(ba));
-        return new PFloat4x4(a);
+        var a4x4:Array = new Array();
+        for each (var n4x4:uint in new Array(16))
+          a4x4.push(readFloat(ba));
+        return new PFloat4x4(a4x4);
       }
       else if (t == PBJType.TInt)
       {
@@ -200,7 +200,7 @@ package pbjAS
       return null;
     }
 
-    private static function readString(ba):String
+    private static function readString(ba:ByteArray):String
     {
       var s:String = new String();
 
@@ -214,7 +214,7 @@ package pbjAS
       return s;
     }
     
-    private static function readUInt24(ba):uint
+    private static function readUInt24(ba:ByteArray):uint
     {
       var src:uint = ba.readShort();
       var srcMask:uint = ba.readUnsignedByte() << 16;
@@ -223,7 +223,7 @@ package pbjAS
       return src;
     }
 
-    private static function assert(v1:Object, v2:Object)
+    private static function assert(v1:Object, v2:Object):void
     {
       if (v1 != v2)
       {
@@ -231,7 +231,7 @@ package pbjAS
       }
     }
 
-    private static function readOp(o:Class, ba:ByteArray)
+    private static function readOp(o:Class, ba:ByteArray):Object
     {
       var dst:uint = ba.readUnsignedShort();
       var mask:uint = ba.readUnsignedByte();

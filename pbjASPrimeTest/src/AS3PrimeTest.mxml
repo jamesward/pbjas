@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" frameRate="250">
 
   <mx:Script>
   <![CDATA[
@@ -67,12 +67,17 @@
       {
         findPrimes(texture, texture[0]);
       }
+      else
+      {
+        rl.text = (new Date().time - startTime.time) + " ms";
+      }
     }
       
   ]]>
   </mx:Script>
   
   <mx:Panel label="Primes" width="100%" height="100%">
+    <mx:Label id="rl"/>
     <mx:TextArea id="ta" width="100%" height="100%"/>
     <mx:ControlBar>
       <mx:ComboBox id="limit">
