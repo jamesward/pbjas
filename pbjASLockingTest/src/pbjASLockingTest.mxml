@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" applicationComplete="initApp()">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" applicationComplete="initApp()" styleName="plain" horizontalAlign="center" paddingTop="15">
   
   <mx:Script>
   <![CDATA[
+    import pbjAS.PBJParam;
     import pbjAS.ops.OpSub;
     import pbjAS.ops.OpAdd;
     import pbjAS.ops.OpDiv;
@@ -40,9 +41,9 @@
       myPBJ.version = 1;
       myPBJ.name = "TestOpSampleNearest";
       myPBJ.metadatas = [];
-      myPBJ.parameters = [{name:"_OutCoord", p:new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G])), metas:[]}, // f0.rg
-        {name:"texture", p:new Texture(2, 0), metas:[]}, // t0
-        {name:"result", p:new Parameter(PBJType.TFloat2, true, new RFloat(1, [PBJChannel.R, PBJChannel.G])), metas:[]} // f1.rg
+      myPBJ.parameters = [new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G]))), // f0.rg
+        new PBJParam("texture", new Texture(1, 0)), // t0
+        new PBJParam("result", new Parameter(PBJType.TFloat2, true, new RFloat(1, [PBJChannel.R, PBJChannel.B]))) // f1.rg
         ];
       myPBJ.code = [
         new OpSampleNearest(new RFloat(1, [PBJChannel.R, PBJChannel.G]), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0) // texn    f1.rg, f0.rg, t0
@@ -88,6 +89,8 @@
       timer.addEventListener(TimerEvent.TIMER, tick);
       timer.start();
       
+      moveRight.play();
+      
       var result:Vector.<Number> = new Vector.<Number>;
 
       shaderJob = new ShaderJob(testShader, result, width, height);
@@ -109,6 +112,8 @@
     private function stopJob():void
     {
       shaderJob.cancel();
+      shaderJob.removeEventListener(Event.COMPLETE, onFloatShaderJobComplete);
+      shaderJob = null;
       shutDownJob();
     }
     
@@ -121,11 +126,34 @@
   ]]>
   </mx:Script>
   
+  <mx:Move id="moveRight" xTo="240" target="{i}">
+    <mx:effectEnd>
+      if (running)
+      {
+        moveLeft.play();
+      }
+    </mx:effectEnd>
+  </mx:Move>
+  <mx:Move id="moveLeft" xTo="0" target="{i}">
+  <mx:effectEnd>
+      if (running)
+      {
+        moveRight.play();
+      }
+    </mx:effectEnd>
+  </mx:Move>
+  
+  <mx:Label text="Run 6000 operations on 1,000,000 numbers."/>
+  
   <mx:HBox>
     <mx:Button label="start" click="startJob()" enabled="{initDone &amp;&amp; !running}"/>
     <mx:Button label="cancel" click="stopJob()" enabled="{running}"/>
   </mx:HBox>
   
   <mx:Label id="ta"/>
+  
+  <mx:Panel title="Look Ma! The UI isn't locked!" width="300" layout="absolute">
+    <mx:Image id="i" source="@Embed('jamescowboy.jpg')"/>
+  </mx:Panel>
   
 </mx:Application>

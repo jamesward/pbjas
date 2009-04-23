@@ -149,7 +149,7 @@ package mathpbj
 
     private function createJob(jobData:JobData):void
     {
-      if ((jobData.width > 8192) || (jobData.height > 8192))
+      if ((jobData.width > 8192) && (jobData.height > 8192))
       {
         throw new Error("Texture width or height cannot exceed 8192");
       }

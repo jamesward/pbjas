@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" initialize="initApp()" styleName="plain" horizontalAlign="center" paddingTop="15">
+  
+    <mx:Script>
+    import pbjAS.PBJParam;
+    import pbjAS.PBJAssembler;
+    import pbjAS.params.Texture;
+    import pbjAS.ops.OpMul;
+    import pbjAS.ops.OpMov;
+    import pbjAS.ops.OpSampleNearest;
+    import pbjAS.PBJType;
+    import pbjAS.PBJChannel;
+    import pbjAS.regs.RFloat;
+    import pbjAS.params.Parameter;
+    import pbjAS.PBJ;
+    
+    import mx.effects.Tween;
+
+    private var testShader:Shader;
+    
+    private function initApp():void
+    {
+      var myPBJ:PBJ = new PBJ();
+      myPBJ.version = 1;
+      myPBJ.name = "VerySimpleFilter";
+      myPBJ.metadatas = [];
+      myPBJ.parameters = [
+        new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, new RFloat(0,[PBJChannel.R,PBJChannel.G]))),  // parameter   "_OutCoord", float2, f0.rg, in
+        new PBJParam("src", new Texture(4,0)),  // texture     "src", t0
+        new PBJParam("dst", new Parameter(PBJType.TFloat4, true, new RFloat(1))),  // parameter   "dst", float4, f1, out
+        new PBJParam("exposure", new Parameter(PBJType.TFloat, false, new RFloat(0, [PBJChannel.B])))  // parameter   "exposure", float, f0.b, in
+      ];
+      myPBJ.code = [
+        new OpSampleNearest(new RFloat(1), new RFloat(0,[PBJChannel.R, PBJChannel.G]), 0),  // texn    f1, f0.rg, t0
+        new OpMul(new RFloat(1), new RFloat(0, [PBJChannel.B, PBJChannel.B, PBJChannel.B, PBJChannel.B])),  // mul     f1, f0.bbbb
+      ];
+
+      var output:ByteArray = PBJAssembler.assemble(myPBJ);
+
+      testShader = new Shader(output);
+    }
+    
+    public function onTweenUpdate(value:Object):void
+    {
+      testShader.data.exposure.value = [value];
+      var shaderFilter:ShaderFilter = new ShaderFilter(testShader);
+      i.filters = [shaderFilter];
+    }
+    
+    public function onTweenEnd(value:Object):void
+    {
+      prevSliderValue = new Number(value);
+    }
+    
+  </mx:Script>
+  
+  <mx:Number id="prevSliderValue">1</mx:Number>
+  
+  <mx:Panel title="pbjas Filter">
+  
+    <mx:Image id="i" source="@Embed('100_1766.JPG')" horizontalAlign="center"/>
+    
+    <mx:ControlBar>
+      <mx:HSlider id="hs" minimum="0" maximum="1" value="1" width="100%">
+        <mx:change>
+          var t:Tween = new Tween(this, prevSliderValue, event.value, 500);
+        </mx:change>
+      </mx:HSlider>
+    </mx:ControlBar>
+    
+  </mx:Panel>
+  
+</mx:Application>

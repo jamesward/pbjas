@@ -27,12 +27,8 @@
  */
 package pbjAS
 {
-  import flash.system.ApplicationDomain;
   import flash.utils.ByteArray;
   import flash.utils.Endian;
-  
-  import mx.core.Application;
-  import mx.core.ClassFactory;
   
   import pbjAS.consts.*;
   import pbjAS.ops.*;

@@ -3,6 +3,7 @@
   
   <mx:Script>
   <![CDATA[
+    import pbjAS.PBJParam;
     import flash.utils.ByteArray;
     
     import mx.controls.Alert;
@@ -25,14 +26,13 @@
       
       var myPBJ:PBJ = new PBJ();
       myPBJ.version = 1;
-      myPBJ.name = "TestOpSampleNearest";
+      myPBJ.name = "OpSampleNearest";
       myPBJ.metadatas = [];
-      myPBJ.parameters = [{name:"_OutCoord", p:new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G])), metas:[]}, // f0.rg
-        {name:"texture", p:new Texture(2, 0), metas:[]}, // t0
-        {name:"result", p:new Parameter(PBJType.TFloat2, true, new RFloat(1, [PBJChannel.R, PBJChannel.G])), metas:[]} // f1.rg
+      myPBJ.parameters = [new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, new RFloat(0, [PBJChannel.R, PBJChannel.G]))), // f0.rg
+        new PBJParam("texture", new Texture(1, 0)), // t0
+        new PBJParam("result", new Parameter(PBJType.TFloat, true, new RFloat(1, [PBJChannel.R]))) // f1.r
         ];
-      myPBJ.code = [
-        new OpSampleNearest(new RFloat(1, [PBJChannel.R, PBJChannel.G]), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f1.rg, f0.rg, t0
+      myPBJ.code = [new OpSampleNearest(new RFloat(1), new RFloat(0, [PBJChannel.R, PBJChannel.G]), 0), // texn    f1, f0.rg, t0
         ];
 
       var assembledPBJByteArray:ByteArray = PBJAssembler.assemble(myPBJ);
