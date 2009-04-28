@@ -11,6 +11,7 @@ package tests
       addTestCase(new TestManualAssembly());
       addTestCase(new TestPBJs());
       addTestCase(new TestShaderFilter());
+      addTestCase(new TestShaderJob());
       
       addTestCase(new TestOpSampleNearest());
       addTestCase(new TestOpDiv());
