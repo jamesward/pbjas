@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="horizontal" styleName="plain"
-  horizontalAlign="center" paddingTop="30" backgroundColor="#ffffff">
+  horizontalAlign="center" paddingTop="30" backgroundColor="#ffffff" viewSourceURL="srcview/index.html">
   
   <mx:Script>
   <![CDATA[

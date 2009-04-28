@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:fluint="http://www.digitalprimates.net/2008/fluint">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:fluint="http://www.digitalprimates.net/2008/fluint" viewSourceURL="srcview/index.html">
 
   <mx:Script>
     import tests.PBJASTestSuite;
