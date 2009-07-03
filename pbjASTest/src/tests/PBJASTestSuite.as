@@ -15,6 +15,8 @@ package tests
       
       addTestCase(new TestOpSampleNearest());
       addTestCase(new TestOpDiv());
+      addTestCase(new TestOpIf());
+      addTestCase(new TestOpElse());
       //etc.  we need 100% test coverage for the operations
     }
     

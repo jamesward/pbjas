@@ -51,12 +51,12 @@
         
       for (var k:int = 0; k < 1000; k++)
       {
-        myPBJ.code.push(new OpSqrt(new RFloat(1, [PBJChannel.R, PBJChannel.G]), new RFloat(1, [PBJChannel.R, PBJChannel.G]))); // sqrt f1.rg, f1.rg
-        myPBJ.code.push(new OpRSqrt(new RFloat(1, [PBJChannel.R, PBJChannel.G]), new RFloat(1, [PBJChannel.R, PBJChannel.G]))); // rsqrt f1.rg, f1.rg
-        myPBJ.code.push(new OpMul(new RFloat(1, [PBJChannel.R, PBJChannel.G]), new RFloat(1, [PBJChannel.R, PBJChannel.G]))); // mul f1.rg, f1.rg
-        myPBJ.code.push(new OpDiv(new RFloat(1, [PBJChannel.R, PBJChannel.G]), new RFloat(1, [PBJChannel.R, PBJChannel.G]))); // div f1.rg, f1.rg
-        myPBJ.code.push(new OpAdd(new RFloat(1, [PBJChannel.R, PBJChannel.G]), new RFloat(1, [PBJChannel.R, PBJChannel.G]))); // add f1.rg, f1.rg
-        myPBJ.code.push(new OpSub(new RFloat(1, [PBJChannel.R, PBJChannel.G]), new RFloat(1, [PBJChannel.R, PBJChannel.G]))); // sub f1.rg, f1.rg
+        myPBJ.code.push(new OpSqrt(new RFloat(Math.random()*1000, [PBJChannel.R, PBJChannel.G]), new RFloat(k, [PBJChannel.R, PBJChannel.G]))); // sqrt f1.rg, f1.rg
+        myPBJ.code.push(new OpRSqrt(new RFloat(Math.random()*1000, [PBJChannel.R, PBJChannel.G]), new RFloat(k, [PBJChannel.R, PBJChannel.G]))); // rsqrt f1.rg, f1.rg
+        myPBJ.code.push(new OpMul(new RFloat(Math.random()*1000, [PBJChannel.R, PBJChannel.G]), new RFloat(k, [PBJChannel.R, PBJChannel.G]))); // mul f1.rg, f1.rg
+        myPBJ.code.push(new OpDiv(new RFloat(Math.random()*1000, [PBJChannel.R, PBJChannel.G]), new RFloat(k, [PBJChannel.R, PBJChannel.G]))); // div f1.rg, f1.rg
+        myPBJ.code.push(new OpAdd(new RFloat(Math.random()*1000, [PBJChannel.R, PBJChannel.G]), new RFloat(k, [PBJChannel.R, PBJChannel.G]))); // add f1.rg, f1.rg
+        myPBJ.code.push(new OpSub(new RFloat(Math.random()*1000, [PBJChannel.R, PBJChannel.G]), new RFloat(k, [PBJChannel.R, PBJChannel.G]))); // sub f1.rg, f1.rg
       }
 
       var assembledPBJByteArray:ByteArray = PBJAssembler.assemble(myPBJ);

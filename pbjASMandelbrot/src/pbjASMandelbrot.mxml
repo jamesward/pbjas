@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" applicationComplete="initApp()" styleName="plain" backgroundColor="#ffffff">
+  
+  <mx:Script>
+  <![CDATA[
+    import pbjAS.regs.PBJReg;
+    import pbjAS.ops.OpTan;
+    import pbjAS.ops.OpLoadInt;
+    import pbjAS.regs.RInt;
+    import pbjAS.ops.OpDiv;
+    import pbjAS.ops.OpSub;
+    import pbjAS.ops.OpElse;
+    import pbjAS.ops.OpLoadFloat;
+    import pbjAS.ops.OpEndIf;
+    import pbjAS.ops.OpIf;
+    import pbjAS.ops.OpLessThan;
+    import pbjAS.ops.OpAdd;
+    import pbjAS.PBJParam;
+    import pbjAS.PBJAssembler;
+    import pbjAS.params.Texture;
+    import pbjAS.ops.OpMul;
+    import pbjAS.ops.OpMov;
+    import pbjAS.ops.OpSampleNearest;
+    import pbjAS.PBJType;
+    import pbjAS.PBJChannel;
+    import pbjAS.regs.RFloat;
+    import pbjAS.params.Parameter;
+    import pbjAS.PBJ;
+    
+    private var numLoops:uint = 128;
+    private var myWidth:uint = 550;
+    private var myHeight:uint = 400;
+    
+    private var output:ByteArray;
+    
+    private function initApp():void
+    {
+      // registers
+      var src:Texture = new Texture(4, 0);
+      var outCoord:RFloat = new RFloat(0, [PBJChannel.R, PBJChannel.G]);
+      var dst:RFloat = new RFloat(1, [PBJChannel.R, PBJChannel.G, PBJChannel.B, PBJChannel.A]);
+      var halfWidth:RFloat = new RFloat(2, [PBJChannel.R]);
+      var halfHeight:RFloat = new RFloat(3, [PBJChannel.R]);
+      var aCx:RFloat = new RFloat(4, [PBJChannel.R]);
+      var aCy:RFloat = new RFloat(5, [PBJChannel.R]);
+      var fScale:RFloat = new RFloat(6, [PBJChannel.R]);
+      var tLimit:RFloat = new RFloat(7, [PBJChannel.R]);
+      var a:RFloat = new RFloat(8, [PBJChannel.R]);
+      var perX:RFloat = new RFloat(9, [PBJChannel.R]);
+      var b:RFloat = new RFloat(10, [PBJChannel.R]);
+      var perY:RFloat = new RFloat(11, [PBJChannel.R]);
+      var two:RFloat = new RFloat(12, [PBJChannel.R]);
+      var asqrd:RFloat = new RFloat(13, [PBJChannel.R]);
+      var bsqrd:RFloat = new RFloat(14, [PBJChannel.R]);
+      var csqrd:RFloat = new RFloat(15, [PBJChannel.R]);
+      var ltn:RFloat = new RFloat(16, [PBJChannel.R]);
+      var storeA:RFloat = new RFloat(17, [PBJChannel.R]);
+      var storeB:RFloat = new RFloat(18, [PBJChannel.R]);
+      var tmpDst:RFloat = new RFloat(19, [PBJChannel.R, PBJChannel.G, PBJChannel.B, PBJChannel.A]);
+      
+      var myPBJ:PBJ = new PBJ();
+      myPBJ.version = 1;
+      myPBJ.name = "Mandelbrot";
+      myPBJ.metadatas = [];
+      myPBJ.parameters = [
+        new PBJParam("src", src),
+        new PBJParam("_OutCoord", new Parameter(PBJType.TFloat2, false, outCoord)),
+        new PBJParam("dst", new Parameter(PBJType.TFloat4, true, dst)),
+        new PBJParam("halfWidth", new Parameter(PBJType.TFloat, false, halfWidth)),
+        new PBJParam("halfHeight", new Parameter(PBJType.TFloat, false, halfHeight)),
+        new PBJParam("aCx", new Parameter(PBJType.TFloat, false, aCx)),
+        new PBJParam("aCy", new Parameter(PBJType.TFloat, false, aCy)),
+        new PBJParam("scale", new Parameter(PBJType.TFloat, false, fScale)),
+        new PBJParam("tLimit", new Parameter(PBJType.TFloat, false, tLimit))
+      ];
+      
+      // if we don't call SampleNearest things get crazy
+      myPBJ.code.push(new OpSampleNearest(tmpDst, outCoord, src.index));
+
+      // create a float of 2 for later
+      myPBJ.code.push(new OpLoadFloat(two, 2)); // 2
+        
+      // a = x * scale
+      myPBJ.code.push(new OpMov(a, fScale)); // scale
+      myPBJ.code.push(new OpMul(a, new RFloat(outCoord.value, [PBJChannel.R])));
+        
+      // a = a + aCx
+      myPBJ.code.push(new OpAdd(a, aCx));
+        
+      // perX = a
+      myPBJ.code.push(new OpMov(perX, a));
+        
+      // b = y * scale
+      myPBJ.code.push(new OpMov(b, fScale)); // scale
+      myPBJ.code.push(new OpMul(b, new RFloat(outCoord.value, [PBJChannel.G])));
+        
+      // b = b + aCy
+      myPBJ.code.push(new OpAdd(b, aCy));
+        
+      // perY = b
+      myPBJ.code.push(new OpMov(perY, b));
+      
+      // unroll the loop
+      for (var i:uint = 0; i < numLoops; i++)
+      {
+        // asqrd = a*a
+        myPBJ.code.push(new OpMov(asqrd, a));
+        myPBJ.code.push(new OpMul(asqrd, a));
+        
+        // bsqrd = b*b
+        myPBJ.code.push(new OpMov(bsqrd, b));
+        myPBJ.code.push(new OpMul(bsqrd, b));
+        
+        // csqrd = asqrd + bsqrd
+        myPBJ.code.push(new OpMov(csqrd, asqrd));
+        myPBJ.code.push(new OpAdd(csqrd, bsqrd));
+        
+        // if (csqrd < tLimit)
+        myPBJ.code.push(new OpMov(ltn, csqrd));
+        myPBJ.code.push(new OpLessThan(ltn, tLimit));
+        
+        myPBJ.code.push(new OpIf(new RInt(0, [PBJChannel.R])));
+          // storeA = asqrd - bsqrd + perX
+          myPBJ.code.push(new OpMov(storeA, asqrd));
+          myPBJ.code.push(new OpSub(storeA, bsqrd)); // bsqrd
+          myPBJ.code.push(new OpAdd(storeA, perX)); // perX
+          
+          // storeB = 2*a*b+perY
+          myPBJ.code.push(new OpMov(storeB, two));
+          myPBJ.code.push(new OpMul(storeB, a)); // a
+          myPBJ.code.push(new OpMul(storeB, b)); // b
+          myPBJ.code.push(new OpAdd(storeB, perY)); // perY
+          
+          // a = storeA
+          myPBJ.code.push(new OpMov(a, storeA));
+          
+          // b = storeB
+          myPBJ.code.push(new OpMov(b, storeB));
+        // else
+        myPBJ.code.push(new OpElse());
+          // dst = i / 255
+          myPBJ.code.push(new OpLoadFloat(new RFloat(tmpDst.value, [PBJChannel.R, PBJChannel.G, PBJChannel.B]), i/255));
+          
+        myPBJ.code.push(new OpEndIf());
+      }
+      
+      myPBJ.code.push(new OpMov(dst, tmpDst));
+
+      output = PBJAssembler.assemble(myPBJ);
+      
+      var shader:Shader = new Shader(output);
+
+      shader.data.halfWidth.value = [myWidth / 2];
+      shader.data.halfHeight.value = [myHeight / 2];
+      shader.data.aCx.value = [0.0];
+      shader.data.aCy.value = [0.0];
+      shader.data.scale.value = [0.01];
+      shader.data.tLimit.value = [4.0];
+    
+      var shaderFilter:ShaderFilter = new ShaderFilter(shader);
+
+      var bitmapData:BitmapData = new BitmapData(myWidth, myHeight, false, 0x000000);
+      bitmapData.applyFilter(bitmapData, bitmapData.rect, bitmapData.rect.topLeft, shaderFilter);
+      
+      uic.addChild(new Bitmap(bitmapData));
+      uic.width = myWidth;
+      uic.height = myHeight;
+    }
+  ]]>
+  </mx:Script>
+  
+  <mx:UIComponent id="uic" width="1" height="1"/>
+  
+  <mx:Button label="save pbj">
+    <mx:click>
+      var fr:FileReference = new FileReference();
+      fr.save(output, "mandelbrot.pbj");
+    </mx:click>
+  </mx:Button>
+  
+</mx:Application>
