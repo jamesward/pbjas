@@ -213,7 +213,7 @@ package pbjAS
     private static function readUInt24(ba:ByteArray):uint
     {
       var src:uint = ba.readShort();
-      var srcMask:uint = ba.readUnsignedByte() << 16;
+      var srcMask:uint = ba.readUnsignedByte();
       src += srcMask;
       
       return src;
